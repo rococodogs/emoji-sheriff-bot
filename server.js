@@ -9,6 +9,8 @@ var emoji = require('emoji')
 var client = require('./twitter-client')()
 var emojiMap = emoji.EMOJI_MAP
 
+var TWEET_LENGTH = 280
+
 var tweetTemplate = function (e) {
   return `
 ⠀ ⠀      🤠
@@ -106,7 +108,7 @@ function post (cb) {
     var random = getRandomSheriff()
     status = `${random.sheriff}\n\n${random.text}`
     
-  } while (status.length > 140)
+  } while (status.length > TWEET_LENGTH)
     
   return client.post('statuses/update', {status}, cb)
 }
