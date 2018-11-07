@@ -2,40 +2,15 @@
 // where your node app starts
 
 // init project
-var express = require('express');
-var app = express();
+var express = require('express')
+var emojiSheriff = require('emoji-sheriff')
+var app = express()
 var emoji = require('emoji')
 
 var client = require('./twitter-client')()
 var emojiMap = emoji.EMOJI_MAP
 
 var TWEET_LENGTH = 280
-
-var tweetTemplate = function (e) {
-  return `
-⠀ ⠀      🤠
-　   ${e} ${e} ${e}
-    ${e}　${e}　${e}
-   👇  ${e}${e} 👇
-  　  ${e}　${e}
-　   ${e}　  ${e}
-　   👢     👢 
-`.trim()
-}
-
-// for some reason the spacing on the HTML template needs
-// to be a bit different from the tweet one?
-var htmlTemplate = function (e) {
-  return `
-⠀ ⠀    🤠
-　   ${e} ${e} ${e}
-    ${e}　${e}　${e}
-   👇  ${e}${e} 👇
-  　  ${e}　${e}
-　   ${e}　  ${e}
-　   👢     👢 
-`.trim()
-}
 
 app.get('/', function (req, res) {
   // getRandomSheriff() removes the chosen emoji from the map,
@@ -46,10 +21,19 @@ app.get('/', function (req, res) {
   var result = keys[idx]
   var data = emoji.EMOJI_MAP[result]
   
-  var sheriff = htmlTemplate(result)
+  var sheriff = emojiSheriff(result)
   var text = `Howdy! I'm the ${data[1]} sheriff!`
   
-  var html = `<!doctype html><pre>${sheriff}</pre><p>${text}</p>`
+  // we need to add an extra space to the <pre> sheriff
+  // to prevent a strange offset of the head.
+  var html = `
+  <!doctype html>
+  <html>
+    <body>
+      <pre> ${sheriff}</pre>
+      <p>${text}</p>
+    </body>
+  </html>`
   
   res.send(html)
 })
@@ -95,7 +79,7 @@ function getRandomSheriff () {
   
   delete emojiMap[result]
   
-  var sheriff = tweetTemplate(result)
+  var sheriff = emojiSheriff(result)
   var text = `Howdy! I'm the ${data[1]} sheriff!`
   
   return {sheriff, text, key: result}
